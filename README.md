@@ -1,10 +1,12 @@
 # primes-clojure
 
-A Clojure library designed to ... well, that part is up to you.
+Prints prime numbers as a multiplication table.
 
 ## Usage
 
-FIXME
+```
+lein run [# of primes]
+```
 
 ## License
 
