@@ -14,10 +14,36 @@
   (num-columns [this]
     (count (.values this))))
 
+(def known-primes (ref [2]))
+
+(defn prime-divisors
+  ""
+  [n]
+  (let [max-factor (int (java.lang.Math/sqrt n))]
+    (take-while (partial >= max-factor) @known-primes)))
+
+(defn prime?
+  ""
+  [n]
+  (not-any? #(zero? (mod n %1)) (prime-divisors n)))
+
+(defn find-first
+  ""
+  [p coll]
+  (first (filter p coll)))
+
+(defn next-prime
+  ""
+  [n]
+  (let [prime (find-first prime? (iterate inc (inc n)))]
+    (dosync (alter known-primes #(conj %1 %2) prime))
+    (identity prime)
+    ))
+
 (defn primes
   "A sequence of prime numbers"
   []
-  (range 1 11))
+  (iterate next-prime 2))
 
 (defn format-number
   ""
@@ -72,6 +98,6 @@
 (defn -main
   "Main entry point"
   [& args]
-  (let [table (MultiplicationTable. (primes))]
+  (let [table (MultiplicationTable. (take 10 (primes)))]
     (println (format-table table))))
 
