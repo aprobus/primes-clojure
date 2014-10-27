@@ -17,23 +17,23 @@
 (def known-primes (ref [2]))
 
 (defn prime-divisors
-  ""
+  "Returns the collection of numbers needed to test if n is a prime number"
   [n]
   (let [max-factor (int (java.lang.Math/sqrt n))]
     (take-while (partial >= max-factor) @known-primes)))
 
 (defn prime?
-  ""
+  "Returns true if the n is prime, false otherwise"
   [n]
   (not-any? #(zero? (mod n %1)) (prime-divisors n)))
 
 (defn find-first
-  ""
+  "Returns the first element in the collection matching the predicate"
   [p coll]
   (first (filter p coll)))
 
 (defn next-odd
-  ""
+  "Returns the first odd number greater than n"
   [n]
   (if (odd? n)
     (+ 2 n)
@@ -41,12 +41,13 @@
   )
 
 (defn next-prime
-  ""
+  "Returns the first prime number greater than n"
   [n]
-  (let [prime (find-first prime? (iterate (partial + 2) (next-odd n)))]
-    (dosync (alter known-primes #(conj %1 %2) prime))
-    (identity prime)
-    ))
+  (if (< n (last @known-primes))
+    (find-first (partial < n) @known-primes)
+    (let [prime (find-first prime? (iterate (partial + 2) (next-odd n)))]
+      (dosync (alter known-primes #(conj %1 %2) prime))
+      (identity prime))))
 
 (defn primes
   "A sequence of prime numbers"
@@ -54,7 +55,7 @@
   (iterate next-prime 2))
 
 (defn format-number
-  ""
+  "Converts a number to a string with the space padded width"
   [width number]
   (format (str "%" width "d") number))
 
@@ -93,7 +94,7 @@
              (dec (.num-columns table))))))
 
 (defn format-table
-  ""
+  "Converts a matrix to a formatted string"
   [table]
   (let [cell-width (max-cell-width table)]
     (clojure.string/join "\n"
@@ -106,6 +107,6 @@
 (defn -main
   "Main entry point"
   [& args]
-  (let [table (MultiplicationTable. (take 10 (primes)))]
+  (let [table (MultiplicationTable. (take 1000 (primes)))]
     (println (format-table table))))
 
