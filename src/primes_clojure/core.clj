@@ -32,10 +32,18 @@
   [p coll]
   (first (filter p coll)))
 
+(defn next-odd
+  ""
+  [n]
+  (if (odd? n)
+    (+ 2 n)
+    (+ 1 n))
+  )
+
 (defn next-prime
   ""
   [n]
-  (let [prime (find-first prime? (iterate inc (inc n)))]
+  (let [prime (find-first prime? (iterate (partial + 2) (next-odd n)))]
     (dosync (alter known-primes #(conj %1 %2) prime))
     (identity prime)
     ))
